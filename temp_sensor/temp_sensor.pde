@@ -35,6 +35,8 @@ float value;
 //////////////////////////////////////////
 char GW_ADDRESS[] = "0013A20040F8DC76";
 //////////////////////////////////////////
+uint8_t  PANID[8] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,  0x22};
+
 
 // Define the Waspmote ID
 char WASPMOTE_ID[] = "node_temp";
@@ -56,6 +58,31 @@ void setup()
   // init XBee
   xbeeZB.ON();
   
+  xbeeZB.setPAN(PANID);
+
+  // check at command flag
+  if (xbeeZB.error_AT == 0)
+  {
+    USB.println(F("2. PANID set OK"));
+  }
+  else
+  {
+    USB.println(F("2. Error while setting PANID"));
+  }
+
+  xbeeZB.setScanningChannels(0x00, 0x02);
+
+  // check at command flag
+  
+  
+  if (xbeeZB.error_AT == 0)
+  {
+    USB.println(F("3. Scanning channels set OK"));
+  }
+  else
+  {
+    USB.println(F("3. Error while setting 'Scanning channels'"));
+  }
   delay(3000);
   
   //////////////////////////
@@ -77,7 +104,7 @@ void loop()
   //Temperature
   temp = Events.getTemperature();
   //Humidity
-  humid = Events.getHumidity();
+  humd = Events.getHumidity();
   //Pressure
   pres = Events.getPressure();
 
@@ -90,7 +117,7 @@ void loop()
   USB.printFloat(temp, 2);
   USB.println(F(" Celsius"));
   USB.print("Humidity: ");
-  USB.printFloat(humid, 1); 
+  USB.printFloat(humd, 1); 
   USB.println(F(" %")); 
 //  USB.print("Pressure: ");
 //  USB.printFloat(pres, 2); 
