@@ -25,6 +25,7 @@
 #include <WaspXBeeZB.h>
 #include <WaspFrame.h>
 
+float acc;
 float temp;
 float humid;
 float pres;
@@ -95,83 +96,104 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-  // Measure temp and hum
-  ///////////////////////////////////////
-  // 1. Read BME280 Values
-  ///////////////////////////////////////
-  // Turn on the sensor board
-  Events.ON();
-  //Temperature
-  temp = Events.getTemperature();
-  //Humidity
-  humid = Events.getHumidity();
-  //Pressure
-  pres = Events.getPressure();
 
-  
-  ///////////////////////////////////////
-  // 2. Print BME280 Values
-  ///////////////////////////////////////
-  USB.println("-----------------------------");
-  USB.print("Temperature: ");
-  USB.printFloat(temp, 2);
-  USB.println(F(" Celsius"));
-  USB.print("Humidity: ");
-  USB.printFloat(humid, 1); 
-  USB.println(F(" %")); 
-//  USB.print("Pressure: ");
-//  USB.printFloat(pres, 2); 
-//  USB.println(F(" Pa")); 
-  USB.println("-----------------------------");  
+  // receive XBee packet (wait for 10 seconds)
+  error = xbeeZB.receivePacketTimeout( 10000 );
 
-  ///////////////////////////////////////////
-  // 1. Create ASCII frame
-  ///////////////////////////////////////////  
-
-  // create new frame
-  frame.createFrame(ASCII);  
-  frame.addSensor(SENSOR_EVENTS_TC, temp);
-  frame.addSensor(SENSOR_EVENTS_HUM, humid);
-  // add frame fields
-//  frame.addSensor(SENSOR_STR, "new_sensor_frame");
-//  frame.addSensor(SENSOR_TEMP, PWR.getBatteryLevel()); 
-//  
-
-  ///////////////////////////////////////////
-  // 2. Send packet
-  ///////////////////////////////////////////  
-
-  // send XBee packet
-  error = xbeeZB.send( GW_ADDRESS, frame.buffer, frame.length );   
-  
-  // check TX flag
-  if( error == 0 )
+  // check answer  
+  if( error == 0 ) 
   {
-    USB.println(F("send ok"));
+    // Show data stored in '_payload' buffer indicated by '_length'
+    USB.print(F("Data: "));  
+    USB.println( xbeeZB._payload, xbeeZB._length);
     
-    // blink green LED
-    Utils.blinkGreenLED();
-    
+    // Show data stored in '_payload' buffer indicated by '_length'
+    USB.print(F("Length: "));  
+    USB.println( xbeeZB._length,DEC);
   }
-  else 
+  else
   {
-    USB.println(F("send error"));
+        // Measure temp and hum
+    ///////////////////////////////////////
+    // 1. Read BME280 Values
+    ///////////////////////////////////////
+    // Turn on the sensor board
+    acc = 1.0;
     
-    // blink red LED
-    Utils.blinkRedLED();
-  }
+    Events.ON();
+    //Temperature
+    temp = Events.getTemperature();
+    //Humidity
+    humid = Events.getHumidity();
+    //Pressure
+    pres = Events.getPressure();
 
+    
+
+    ///////////////////////////////////////
+    // 2. Print BME280 Values
+    ///////////////////////////////////////
+    USB.println("-----------------------------");
+    USB.print("Temperature: ");
+    USB.printFloat(temp, 2);
+    USB.println(F(" Celsius"));
+    USB.print("Humidity: ");
+    USB.printFloat(humid, 1); 
+    USB.println(F(" %")); 
+  //  USB.print("Pressure: ");
+  //  USB.printFloat(pres, 2); 
+  //  USB.println(F(" Pa")); 
+    USB.println("-----------------------------");  
+  
+    ///////////////////////////////////////////
+    // 1. Create ASCII frame
+    ///////////////////////////////////////////  
+  
+    // create new frame
+    frame.createFrame(ASCII);  
+    frame.addSensor(SENSOR_ACC, acc);
+    frame.addSensor(SENSOR_EVENTS_TC, temp);
+    frame.addSensor(SENSOR_EVENTS_HUM, humid);
+    // add frame fields
+  //  frame.addSensor(SENSOR_STR, "new_sensor_frame");
+  //  frame.addSensor(SENSOR_TEMP, PWR.getBatteryLevel()); 
+  //  
+  
+    ///////////////////////////////////////////
+    // 2. Send packet
+    ///////////////////////////////////////////  
+  
+    // send XBee packet
+    send_error = xbeeZB.send( GW_ADDRESS, frame.buffer, frame.length );   
+    
+    // check TX flag
+    if( send_error == 0 )
+    {
+      USB.println(F("send ok"));
+      
+      // blink green LED
+      Utils.blinkGreenLED();
+      
+    }
+    else 
+    {
+      USB.println(F("send error"));
+      
+      // blink red LED
+      Utils.blinkRedLED();
+    }
+  }
   // wait for five seconds
-  delay(5000);
+//  delay(5000);
 
   
   ///////////////////////////////////////
   // 3. Go to deep sleep mode
   ///////////////////////////////////////
-  USB.println(F("enter deep sleep"));
-  PWR.deepSleep("00:00:00:10", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-  USB.ON();
-  USB.println(F("wake up\n"));
+//  USB.println(F("enter deep sleep"));
+//  PWR.deepSleep("00:00:00:10", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+//  USB.ON();
+//  USB.println(F("wake up\n"));
 }
 
 /*******************************************
