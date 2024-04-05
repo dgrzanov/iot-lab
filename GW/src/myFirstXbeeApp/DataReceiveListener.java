@@ -1,6 +1,5 @@
 package myFirstXbeeApp;
 
-
 import com.digi.xbee.api.listeners.IDataReceiveListener;
 import com.digi.xbee.api.models.XBeeMessage;
 import com.digi.xbee.api.utils.HexUtils;
@@ -14,9 +13,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 public class DataReceiveListener implements IDataReceiveListener {
 	
 	private static final int QUALITY_OF_SERVICE = 2;
-    private static final String BROKER = "";
-    private static final String CLIENT_ID = "";
-    private static final String TOPIC_ACTUATION = "";
+    private static final String BROKER = "tcp://172.20.10.12:1883";
+    private static final String CLIENT_ID = "MqttClientGw";
+    private static final String TOPIC_ACTUATION = "WED/actions";
 
     private MqttClient mqttClient;
 	/*
@@ -36,11 +35,11 @@ public class DataReceiveListener implements IDataReceiveListener {
             String acceleration = getSensorValue(content, "ACC");
             String temperature = getSensorValue(content, "TC");
             String humidity = getSensorValue(content, "HUM");
+            
+            String data = new String(acceleration + "," + temperature + "," + humidity + ",1");
 
-            sendMessage(acceleration, "");
-            sendMessage(temperature, "");
-            sendMessage(humidity, "");
-
+            sendMessage(data, "WED/readings");
+            
             disconnectFromMQTT();
         } catch (MqttException ex) {
             ex.printStackTrace();
@@ -52,6 +51,7 @@ public class DataReceiveListener implements IDataReceiveListener {
         connOpts.setCleanSession(true);
         mqttClient.connect(connOpts);
         mqttClient.subscribe(TOPIC_ACTUATION, QUALITY_OF_SERVICE);
+        
     }
 
     private void disconnectFromMQTT() throws MqttException {
@@ -72,5 +72,6 @@ public class DataReceiveListener implements IDataReceiveListener {
         System.out.println("getSensorValue:" + valueString);
         return valueString;
     }
+    
 }
 
