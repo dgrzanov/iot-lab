@@ -33,7 +33,7 @@ float value;
 
 // Destination MAC address
 //////////////////////////////////////////
-char GW_ADDRESS[] = "0013A200403A2A49";
+char GW_ADDRESS[] = "0013A20040F8DC76";
 //////////////////////////////////////////
 
 // Define the Waspmote ID
