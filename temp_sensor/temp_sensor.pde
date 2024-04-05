@@ -45,6 +45,7 @@ char WASPMOTE_ID[] = "node_temp";
 
 // define variable
 uint8_t error;
+uint8_t send_error;
 
 void setup()
 {
