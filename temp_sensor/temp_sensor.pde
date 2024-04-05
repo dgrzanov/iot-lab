@@ -77,7 +77,7 @@ void loop()
   //Temperature
   temp = Events.getTemperature();
   //Humidity
-  humd = Events.getHumidity();
+  humid = Events.getHumidity();
   //Pressure
   pres = Events.getPressure();
 
@@ -90,7 +90,7 @@ void loop()
   USB.printFloat(temp, 2);
   USB.println(F(" Celsius"));
   USB.print("Humidity: ");
-  USB.printFloat(humd, 1); 
+  USB.printFloat(humid, 1); 
   USB.println(F(" %")); 
 //  USB.print("Pressure: ");
 //  USB.printFloat(pres, 2); 
