@@ -26,7 +26,7 @@
 #include <WaspFrame.h>
 
 float temp;
-float humd;
+float humid;
 float pres;
 float value;
 
